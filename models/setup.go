@@ -12,6 +12,5 @@ func SetupModels() *gorm.DB {
 	if err != nil {
 		panic("gagal konek db")
 	}
-	db.AutoMigrate(&Barang{})
 	return db
 }
