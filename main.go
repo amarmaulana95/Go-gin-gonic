@@ -14,6 +14,7 @@ func main() {
 	//panggil models
 	db := models.SetupModels()
 	r.Use(func(c *gin.Context) {
+		//"db" param gingonic
 		c.Set("db", db)
 		c.Next()
 	})
@@ -23,6 +24,9 @@ func main() {
 	})
 
 	r.GET("/barang", controller.BarangTampil)
+	r.POST("/barang", controller.BarangAdd)
+	r.PUT("/barang/:id", controller.BarangUpdate)
+	r.DELETE("/barang/:id", controller.BarangDelete)
 
 	r.Run()
 }
