@@ -2,7 +2,9 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"goapi.com/models"
@@ -19,14 +21,33 @@ func BarangTampil(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	//buat data array
 	var data []models.Barang
+	pagination.Paging(&pagination.Param{
+		DB:      db.Where("id > ?", 0),
+		Page:    1,
+		Limit:   3,
+		OrderBy: []string{"id desc"},
+		ShowSQL: true,
+	}, &data)
 	//find bawaan gorm  -> select *
-	db.Find(&data)
+	// db.Find(&data)
 	//cek data
 	if len(data) <= 0 {
 		//response
 		c.JSON(http.StatusNotFound, gin.H{"message": http.StatusNotFound, "result": "Data Tidak Ada"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"data": data})
+		// c.JSON(http.StatusOK, gin.H{"data": data})
+		page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "6"))
+		var data []models.Barang
+
+		paginator := pagination.Paging(&pagination.Param{
+			DB:      db,
+			Page:    page,
+			Limit:   limit,
+			OrderBy: []string{"id desc"},
+			ShowSQL: true,
+		}, &data)
+		c.JSON(200, paginator)
 	}
 }
 
